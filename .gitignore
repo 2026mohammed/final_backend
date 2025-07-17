@@ -1,0 +1,58 @@
+# Flutter/Dart/Pub related
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+generated_plugin_registrant.dart
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# IntelliJ related
+*.iml
+.idea/
+*.ipr
+*.iws
+
+# Android Studio
+.android/
+
+# iOS/Xcode
+ios/Flutter/.last_build_id
+ios/Pods
+ios/Runner.xcworkspace
+ios/DerivedData/
+ios/.symlinks/
+ios/.flutter-plugins
+ios/.flutter-plugins-dependencies
+
+# macOS
+macos/Flutter/ephemeral/
+macos/Pods
+macos/Runner.xcworkspace
+macos/.flutter-plugins
+macos/.flutter-plugins-dependencies
+
+# Windows
+windows/Flutter/ephemeral/
+
+# Web
+web/.dart_tool/
+
+# Linux
+linux/Flutter/ephemeral/
+
+# Others
+*.log
+*.lock
+*.tmp
+*.swp
+*.DS_Store
+*.bak
+*.orig
+*.h5
+venv/
