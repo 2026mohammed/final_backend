@@ -6,21 +6,9 @@ import io
 import requests
 import tempfile
 
-# Google Drive file ID
-FILE_ID = "1AZuoRgRVVY1_OWJDlXr1IUtNT-xjyGLL"
-# رابط التحميل المباشر للنموذج
-url = f"https://drive.google.com/uc?export=download&id={FILE_ID}"
-
-# تحميل النموذج من Google Drive وحفظه مؤقتًا
-response = requests.get(url)
-response.raise_for_status()
-
-with tempfile.NamedTemporaryFile(suffix=".h5") as temp_file:
-    temp_file.write(response.content)
-    temp_file.flush()
 
     # تحميل النموذج
-    model = load_model(temp_file.name)
+    model = load_model("model/plant_disease_model.h5")
 
 # الأصناف حسب ترتيب التدريب
 class_names = [
