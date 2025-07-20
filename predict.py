@@ -7,8 +7,8 @@ import requests
 import tempfile
 
 
-    # تحميل النموذج
-    model = load_model("model/plant_disease_model.h5")
+# تحميل النموذج
+model = load_model("model/plant_disease_model.h5")
 
 # الأصناف حسب ترتيب التدريب
 class_names = [
