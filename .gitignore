@@ -54,5 +54,4 @@ linux/Flutter/ephemeral/
 *.DS_Store
 *.bak
 *.orig
-*.h5
 venv/
