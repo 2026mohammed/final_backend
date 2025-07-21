@@ -9,5 +9,7 @@ os.makedirs("model", exist_ok=True)
 if not os.path.exists(output_path):
     print("Downloading model...")
     gdown.download(url, output_path, quiet=False)
+    print("Model downloaded successfully.")
+    print(output_path)
 else:
     print("Model already exists.")
