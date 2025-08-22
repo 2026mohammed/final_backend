@@ -2,6 +2,7 @@ import uvicorn
 from tensorflow.keras.models import load_model
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 import numpy as np
 import cv2
 import tensorflow as tf
@@ -9,11 +10,11 @@ from tensorflow.keras.applications.efficientnet import preprocess_input
 import os
 import io
 from PIL import Image
-
-
+app = FastAPI(title="Plant Disease Diagnosis API")
+# تحديد مسار النموذج
+#MODEL_PATH = os.getenv("MODEL_PATH", "model.h5")
 # 1️⃣ تحميل النموذج
-MODEL_PATH = "best_model (2).h5"   # غير المسار إذا مختلف
-model = load_model(MODEL_PATH)
+model = load_model("best_model (2).h5", compile=False)
 
 # 2️⃣ أسماء الفئات (38 class)
 class_names = [
@@ -98,19 +99,14 @@ treatments = {
     "Tomato___Tomato_mosaic_virus": "إزالة النباتات المصابة، تعقيم الأدوات.",
     "Tomato___healthy": "لا يوجد علاج، النبات سليم."
 }
-# --------------------------
-# 2️⃣ دالة لتحضير الصورة
-# --------------------------
-def prepare_image(image_bytes, img_size=(224,224)):
-    img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-    img = img.resize(img_size)
-    img = np.array(img)
-    img = np.expand_dims(img, axis=0)
-    img = preprocess_input(img)  # مهم لـ EfficientNet
-    return img
-    
-# 4️⃣ إعداد FastAPI
-app = FastAPI(title="Plant Disease Diagnosis API")
+# # ===== دالة تجهيز الصورة =====
+def preprocess_image(image_bytes, target_size=(224, 224)):
+    image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+    image = image.resize(target_size)
+    image_array = np.array(image)
+    image_array = preprocess_input(image_array)  # مهم: EfficientNet preprocessing
+    image_array = np.expand_dims(image_array, axis=0)
+    return image_array
 
 # 5️⃣ تفعيل CORS
 app.add_middleware(
@@ -121,26 +117,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --------------------------
-# 4️⃣ Route للفحص
-# --------------------------
+# ===== endpoint للتشخيص =====
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
-    image_bytes = await file.read()
-    img = prepare_image(image_bytes)
+    try:
+        image_bytes = await file.read()
+        image_array = preprocess_image(image_bytes)
+        prediction = model.predict(image_array)
+        predicted_index = np.argmax(prediction, axis=1)[0]
+        predicted_class = class_names[predicted_index]
+        confidence = float(np.max(prediction))
+        return JSONResponse(content={"class": predicted_class, "confidence": confidence})
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": str(e)})
 
-    predictions = model.predict(img)
-    class_idx = np.argmax(predictions, axis=1)[0]
-    confidence = float(predictions[0][class_idx])
-
-    return {
-        "disease": class_names[class_idx],
-        "confidence": round(confidence * 100, 2),
-        "treatment": treatments.get(class_names[class_idx], "لا توجد توصية علاجية متوفرة.")
-    }
-
-# --------------------------
-# 5️⃣ تشغيل السيرفر
-# --------------------------
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+# ===== endpoint اختبار السيرفر =====
+@app.get("/")
+def read_root():
+    return {"message": "API is running"}
