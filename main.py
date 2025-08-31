@@ -14,7 +14,7 @@ from PIL import Image
 # تحديد مسار النموذج
 #MODEL_PATH = os.getenv("MODEL_PATH", "model.h5")
 # 1️⃣ تحميل النموذج
-model = load_model("plant_disease_model3.keras")
+model = load_model("plant_disease_model_final.keras")
 
 # 2️⃣ أسماء الفئات (38 class)
 class_names = [
